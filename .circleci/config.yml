@@ -9,7 +9,7 @@ commands:
 jobs:
   use_command:
     docker:
-      image: alpine
+      - image: alpine
     steps:
       - print_pipeline_id
 workflows:
