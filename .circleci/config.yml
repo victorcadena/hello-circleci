@@ -5,7 +5,7 @@ commands:
   fail_job:
     description: "Fails the step"
     steps:
-      - run: return 1
+      - run: exit 1
 jobs:
   use_command:
     docker:
