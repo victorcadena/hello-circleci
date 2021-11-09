@@ -2,16 +2,19 @@
 version: 2.1
 # Use a package of configuration called an orb.
 commands:
-  print_pipeline_id:
-    description: "Prints the pipeline id"
+  fail_job:
+    description: "Fails the step"
     steps:
-      - run: echo $CIRCLE_WORKFLOW_ID
+      - run: return 1
 jobs:
   use_command:
     docker:
-      - image: alpine
+      - image: circleci/node:13.8.0
     steps:
-      - print_pipeline_id
+      - run:
+          command: fail_job
+          when: on_fail
+
 workflows:
   test_workflow:
     jobs:
