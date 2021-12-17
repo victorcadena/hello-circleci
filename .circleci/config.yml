@@ -17,7 +17,7 @@ jobs:
       - run: echo world
   print_env_var:
     docker:
-      - image: circleci/alpine
+      - image: alpine
     steps:
       - run:
           name: "My env var"
