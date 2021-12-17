@@ -6,11 +6,13 @@ orbs:
 # Use a package of configuration called an orb.
 jobs:
   print_hello:
-    docker: circleci/node:13.8.0
+    docker: 
+      - image: circleci/node:13.8.0
     steps:
       - run: echo hello
   print_world:
-    docker: circleci/node:13.8.0
+    docker:
+      - image: circleci/node:13.8.0
     steps:
       - run: echo world
 
