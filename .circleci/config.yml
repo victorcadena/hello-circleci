@@ -9,32 +9,15 @@ commands:
     steps:
       - run: echo $CIRCLE_WORKFLOW_ID
 jobs:
-  save_hello_world_output:
-    docker: 
-      - image: alpine
+  fail_job_test:
+    docker: alpine
     steps:
-      - run: echo "text to output here" > ~/output.txt
-      - persist_to_workspace: 
-          root: ~/
-          paths:
-            - output.txt
-  print_output_file:
-    docker: 
-      - image: alpine
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run: cat ~/output.txt
-  reuse_comand:
-    docker: 
-      - image: alpine
-    steps:
-      - print_pipeline_id
+      - run: echo "victor"
+      - run: return 1
+      - run: 
+          command: echo "fauiled"
+          when: on_fail
 workflows:
   default:
     jobs:
-      - save_hello_world_output
-      - print_output_file:
-          requires:
-            - save_hello_world_output
-      - reuse_comand
+      - fail_job_test
