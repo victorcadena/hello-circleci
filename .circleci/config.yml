@@ -4,6 +4,10 @@ orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
 # Use a package of configuration called an orb.
+commands:
+  print_pipeline_id:
+    - steps:
+        run: echo $CIRCLE_WORKFLOW_ID
 jobs:
   save_hello_world_output:
     docker: 
@@ -21,6 +25,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: cat ~/output.txt
+  reuse_comand:
+    - steps:
+      - print_pipeline_id
 workflows:
   default:
     jobs:
