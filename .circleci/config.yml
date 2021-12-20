@@ -37,3 +37,4 @@ workflows:
       - print_output_file:
           requires:
             - save_hello_world_output
+      - reuse_comand
