@@ -16,7 +16,7 @@ jobs:
             - output.txt
   print_output_file:
     docker: 
-      -image: alpine
+      - image: alpine
     steps:
       - attach_workspace:
           at: ~/
