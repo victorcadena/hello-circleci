@@ -5,7 +5,7 @@ orbs:
   welcome: circleci/welcome-orb@0.4.1
 # Use a package of configuration called an orb.
 jobs:
-  - save_hello_world_output:
+  save_hello_world_output:
       docker: alpine
       steps:
         - run: echo "text to output here" > output.txt
@@ -13,7 +13,7 @@ jobs:
             root: ~/
             paths:
               - output.txt
-  - print_output_file:
+  print_output_file:
       docker: alpine
       steps:
         - attach_workspace:
