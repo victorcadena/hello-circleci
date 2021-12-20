@@ -5,31 +5,24 @@ orbs:
   welcome: circleci/welcome-orb@0.4.1
 # Use a package of configuration called an orb.
 jobs:
-  print_hello:
-    docker: 
-      - image: circleci/node:13.8.0
+  - save_hello_world_output:
+    docker: alpine
     steps:
-      - run: echo hello
-  print_world:
-    docker:
-      - image: circleci/node:13.8.0
+      - run: echo "text to output here" > output.txt
+      - persist_to_workspace: 
+        root: ~/
+        paths:
+          - output.txt
+  - print_output_file:
+    docker: alpine
     steps:
-      - run: echo world
-  print_env_var:
-    docker:
-      - image: alpine
-    steps:
-      - run:
-          name: "My env var"
-          command: echo $MY_NAME
-
+      - attach_workspace:
+          at: ~/
+      - run: cat output.txt
 workflows:
   default:
     jobs:
-      - print_hello
-      - print_world:
+      - save_hello_world_output
+      - print_output_file:
           requires:
-            - print_hello
-      - print_env_var:
-          requires:
-            - print_world
+            - save_hello_world_output
