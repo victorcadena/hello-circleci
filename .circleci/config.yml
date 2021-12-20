@@ -6,7 +6,8 @@ orbs:
 # Use a package of configuration called an orb.
 jobs:
   save_hello_world_output:
-      docker: alpine
+      docker: 
+        - image: alpine
       steps:
         - run: echo "text to output here" > output.txt
         - persist_to_workspace: 
@@ -14,7 +15,8 @@ jobs:
             paths:
               - output.txt
   print_output_file:
-      docker: alpine
+      docker: 
+        -image: alpine
       steps:
         - attach_workspace:
             at: ~/
