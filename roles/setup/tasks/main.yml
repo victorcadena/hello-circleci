@@ -1,0 +1,31 @@
+- name: "update packages"
+  apt: 
+    update_cache: yes
+
+- name: "upgrade packages"
+  apt:
+    upgrade: yes
+
+- name: "install dependencies"
+  apt:
+    name: ["make", "build-essential"]
+
+- name: "install node"
+  apt: 
+    name: ["nodejs" , "npm"]
+
+- name: "install pm2"
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
+
+- name: "copy node files"
+  copy: 
+    src: index.js
+    dest: /opt
+
+- name: "start web server"
+  shell: pm2 start /opt/index.js -f
