@@ -11,9 +11,6 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout 
-      - run:
-          name: "debug env vars"
-          command: echo $AWS_ACCESS_KEY_ID
       - run: 
           name: "Create Cloud Formation Infra"
           command: |
@@ -22,12 +19,13 @@ jobs:
               --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region $AWS_DEFAULT_REGION
   configure_infrastructure:
-    add_ssh_keys:
-      fingerprints: ["3f:de:1b:5a:67:fb:ed:53:a4:98:d5:ac:37:42:6a:dd"] 
+    
     docker:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints: ["3f:de:1b:5a:67:fb:ed:53:a4:98:d5:ac:37:42:6a:dd"] 
       - run:
           name: "Install Ansible"
           command: apk add --update ansible
