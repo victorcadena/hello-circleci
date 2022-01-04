@@ -4,6 +4,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      GroupDescription: "Test Group"
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '22'
@@ -12,7 +13,6 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      GroupDescription: "Test Group"
       SecurityGroups:
         - !Ref SecurityGroup
       KeyName: AWS_EC2_DEMP
