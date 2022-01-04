@@ -12,6 +12,9 @@ jobs:
         - image: amazon/aws-cli
       steps:
         - checkout # check out the code in the project directory
+        - run:
+            name: "debug env vars"
+            command: echo $AWS_ACCESS_KEY_ID
         - run: 
             name: "Create Cloud Formation Infra"
             command: |
