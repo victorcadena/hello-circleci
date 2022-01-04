@@ -12,6 +12,7 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
+      GroupDescription: "Test Group"
       SecurityGroups:
         - !Ref SecurityGroup
       KeyName: AWS_EC2_DEMP
