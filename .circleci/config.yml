@@ -1,8 +1,6 @@
 version: 2.1
 # Use a package of configuration called an orb.
 orbs:
-  # Choose either one of the orbs below
-  # welcome: circleci/welcome-orb@0.4.1
   aws-cli: circleci/aws-cli@2.0.3
 
 jobs:
@@ -19,7 +17,6 @@ jobs:
               --stack-name myStack \
               --region $AWS_DEFAULT_REGION
   configure_infrastructure:
-    
     docker:
       - image: python:3.7-alpine3.11
     steps:
