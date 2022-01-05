@@ -41,8 +41,7 @@ jobs:
           command: |
             ansible-playbook -i inventory main.yml
   smoke_test:
-    docker:
-      - image: alpine
+    executor: aws-cli/default
     steps:
       - aws-cli/setup
       - run: apk add --update curl
