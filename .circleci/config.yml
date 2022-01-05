@@ -13,55 +13,68 @@ commands:
           when: on_fail
 
 jobs:
-  create_infrastructure:  
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout 
-      - run: 
-          name: "Create Cloud Formation Infra"
-          command: |
-            aws cloudformation deploy \
-              --template-file template.yml \
-              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7} \
-              --region $AWS_DEFAULT_REGION
-      
-  configure_infrastructure:
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["3f:de:1b:5a:67:fb:ed:53:a4:98:d5:ac:37:42:6a:dd"] 
-      - run:
-          name: "Install Ansible"
-          command: apk add --update ansible
-      - run: 
-          name: "Run playbook and configure servers"
-          command: |
-            ansible-playbook -i inventory main.yml
-  smoke_test:
+  create_and_deploy_front_end:
     executor: aws-cli/default
     steps:
       - aws-cli/setup
-      - run: 
-          name: "Smoke test"
+      - checkout
+      - run:
+          name: Execute bucket.yml - Create Cloudformation Stack
           command: |
-            URL="https://blog.udacity12312.com/"
-            if curl -s --head ${URL} 
-            then
-              return 0
-            else
-              return 1
-            fi
-      - destroy_environments
+            aws cloudformation deploy --template-file bucket.yml \
+            --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7}
+            --parameter-overrides MyBucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
+      - run: aws s3 sync index.html s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7} --delete
+  get_last_deployment_id:
+    executor: aws-cli/default
+    steps:
+      - aws-cli/setup
+      - run:
+          name: "Get previous pipeline id"
+          command: |
+            aws cloudformation list-exports --query "Exports[?Name==\`PipelineID\`].Value" --no-paginate \ 
+            --output text > ~/textfile.txt
+      - persist_to_workspace:
+          root: ~/
+          paths: 
+            - textfile.txt
+  promote_to_production:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Execute cloudfront.yml
+          command: |
+            aws cloudformation deploy \
+            --template-file cloudfront.yml \
+            --stack-name production-distro \
+            --parameter-overrides PipelineID="mybucket-${CIRCLE_WORKFLOW_ID:0:7}"
+  clean_up_old_front_end:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Destroy the previous S3 bucket and CloudFormation stack. 
+          # Use $OldBucketID environment variable or mybucket644752792305 below.
+          # Similarly, you can create and use $OldStackID environment variable in place of production-distro 
+          command: |
+            export OldBucketID=$(cat ~/textfile.txt)
+            aws s3 rm "s3://${OldBucketID}" --recursive
+
 workflows:
   my_workflow:
     jobs:
-      - create_infrastructure
-      # - configure_infrastructure:
-      #     requires: 
-      #       - create_infrastructure
-      - smoke_test:
+      - create_and_deploy_front_end
+      - promote_to_production:
+          requires: 
+            - create_and_deploy_front_end
+      - get_last_deployment_id
+      - clean_up_old_front_end:
           requires:
-            - create_infrastructure
+            - get_last_deployment_id
+            - promote_to_production
