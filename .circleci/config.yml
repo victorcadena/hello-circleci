@@ -3,6 +3,15 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
 
+commands:
+  destroy_environments: 
+    steps:
+      - run: 
+          name: destroy infrastructure
+          command: |
+            aws cloudformation destroy-stack myStack-${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+
 jobs:
   create_infrastructure:  
     docker:
@@ -14,8 +23,9 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file template.yml \
-              --stack-name myStack \
+              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7} \
               --region $AWS_DEFAULT_REGION
+      
   configure_infrastructure:
     docker:
       - image: python:3.7-alpine3.11
@@ -38,17 +48,18 @@ jobs:
       - run: 
           name: "Smoke test"
           command: |
-            URL="https://blog.udacity.com/"
+            URL="https://blog.udacity12312.com/"
             if curl -s --head ${URL} 
             then
               return 0
             else
               return 1
             fi
+      - destroy_environments
 workflows:
   my_workflow:
     jobs:
-      # - create_infrastructure
+      - create_infrastructure
       # - configure_infrastructure:
       #     requires: 
       #       - create_infrastructure
