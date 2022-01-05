@@ -9,7 +9,7 @@ commands:
       - run: 
           name: destroy infrastructure
           command: |
-            aws cloudformation destroy-stack myStack-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack myStack-${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
 
 jobs:
@@ -44,7 +44,6 @@ jobs:
     executor: aws-cli/default
     steps:
       - aws-cli/setup
-      - run: apk add --update curl
       - run: 
           name: "Smoke test"
           command: |
