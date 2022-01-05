@@ -44,6 +44,7 @@ jobs:
     docker:
       - image: alpine
     steps:
+      - aws-cli/setup
       - run: apk add --update curl
       - run: 
           name: "Smoke test"
